@@ -11,7 +11,6 @@ const getPatientsTriaje = async (req, res) => {
 
 const createPatientTriaje = async (req, res) => {
     const data = {
-        patient: req.body.patient,
         admissionTime: req.body.admissionTime,
         temperature: req.body.temperature,
         heartRate: req.body.heartRate,
@@ -22,22 +21,28 @@ const createPatientTriaje = async (req, res) => {
         description: req.body.description,
         state: req.body.state,
     }
-    try{
-        const patientSearch = await PatientTriaje.findOne({patient: data.patient});
-        if(!patientSearch){
-            const patient = new PatientTriaje(data);
-            await patient.save();
-            return res.json({
-                message: 'Patient added to Triaje successfully',
-                data: patient
-            });
-        } else{
-            return res.status(409).json({message: 'Patient already exists in Triaje'});
+        if(req.body.patient){
+            const patient = await Patient.findOne({dni: req.body.patient.dni});
+            if(!patient){
+                return res.status(404).json({message: 'Patient not registered'});
+            } else{
+                const patientSearch = await PatientTriaje.findOne({patient: patient._id});
+                if(!patientSearch){
+                    data.patient = patient._id;
+                    const newPatient = new PatientTriaje(data);
+                    await newPatient.save();
+                    return res.status(201).json({
+                        message: 'Patient added to Triaje successfully',
+                        data: newPatient
+                    });
+                } else{
+                    return res.status(409).json({message: 'Patient already exists in Triaje'});
+                }
+            }
+        } else {
+            console.log(req.body)
+            return res.status(400).json({message: 'Bad request'});
         }
-    } catch (error) {
-        res.status(500).json({message: error});
-        res.send(error);
-    }
 }
 
 const getPatientTriaje = async (req, res) => {
