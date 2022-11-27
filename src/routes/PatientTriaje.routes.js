@@ -6,7 +6,7 @@ const PatientTriajeController = require('../controller/PatientTriaje.Controller.
 const PatientsTriajeRoutes = Router();
 
 PatientsTriajeRoutes.get('/triaje', PatientTriajeController.getPatientsTriaje);
-// PatientsTriajeRoutes.get('/triaje', PatientTriajeController.getPatientTriaje);
+PatientsTriajeRoutes.get('/triaje/:dni', PatientTriajeController.getPatientTriaje);
 PatientsTriajeRoutes.post('/triaje', PatientTriajeController.createPatientTriaje);
 
 module.exports = PatientsTriajeRoutes;
