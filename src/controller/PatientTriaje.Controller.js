@@ -1,3 +1,4 @@
+const Patient = require('../models/Patient');
 const PatientTriaje = require('../models/PatientTriaje');
 
 const getPatientsTriaje = async (req, res) => {
@@ -39,7 +40,31 @@ const createPatientTriaje = async (req, res) => {
     }
 }
 
+const getPatientTriaje = async (req, res) => {
+    const dni = parseInt(req.params.dni);
+    if(dni){
+        const patient = await Patient.findOne({dni: dni })
+        if(!patient){
+            return res.status(404).json({message: 'Patient not registered'});
+        } else{
+            console.log(patient);
+            const patientTriaje = await PatientTriaje.find({ patient: patient._id }).populate('patient');
+            if(!patientTriaje){
+                return res.status(404).json({message: 'Patient not found in Triaje'});
+            } else{
+                return res.json({
+                    message: 'Patient found successfully in Triaje',
+                    data: patientTriaje
+                });
+            }
+        }
+    } else {
+        return res.status(400).json({message: 'Bad request'});
+    }
+}
+
 module.exports = {
     getPatientsTriaje,
-    createPatientTriaje
+    createPatientTriaje,
+    getPatientTriaje
 }
